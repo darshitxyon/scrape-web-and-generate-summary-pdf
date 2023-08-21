@@ -2,39 +2,36 @@
 import sys
 from scraping.scrapy_spider import ScrapySpider
 from scraping.beautifulsoup_scraper import BeautifulSoupScraper
-from summary.openai_api import OpenAISummarizer
+from summary.openai_api import OpenAIAPI
 from pdf_generation.pdf_generator import PDFGenerator
-from utils.url_input import get_search_url
 
 def main():
-    # Get the search URL from command line argument
-    search_url = get_search_url(sys.argv)
+    # Get the search URL from command line arguments
+    search_url = sys.argv[1]
 
     # Initialize the Scrapy spider
-    scrapy_spider = ScrapySpider(search_url)
+    spider = ScrapySpider(search_url)
 
-    # Extract links using Scrapy
-    links = scrapy_spider.extract_links()
-
-    # If Scrapy fails, use BeautifulSoup as a backup
-    if not links:
+    # Scrape the search results
+    try:
+        search_results = spider.scrape()
+    except Exception as e:
+        print(f"Scrapy failed with error: {e}")
+        print("Switching to BeautifulSoup for scraping...")
         bs_scraper = BeautifulSoupScraper(search_url)
-        links = bs_scraper.extract_links()
+        search_results = bs_scraper.scrape()
 
-    # Initialize the OpenAI summarizer
-    summarizer = OpenAISummarizer()
+    # Initialize the OpenAI API
+    openai_api = OpenAIAPI()
+
+    # Summarize the search results
+    summarized_results = openai_api.summarize(search_results)
 
     # Initialize the PDF generator
     pdf_generator = PDFGenerator()
 
-    # For each link, extract the text, summarize it, and add it to the PDF
-    for link in links:
-        text = scrapy_spider.extract_text(link) or bs_scraper.extract_text(link)
-        summary = summarizer.summarize(text)
-        pdf_generator.add_page(link, summary)
-
-    # Save the PDF
-    pdf_generator.save_pdf()
+    # Generate the PDF
+    pdf_generator.generate(summarized_results)
 
 if __name__ == "__main__":
     main()

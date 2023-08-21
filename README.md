@@ -4,7 +4,7 @@ This is a web scraping tool built to extract data from any search engine.
 
 ## Tech Stack
 
-- Python with Scrapy and BeautifulSoup for web scraping
+- Python 3.11.3 with Scrapy and BeautifulSoup for web scraping
 
 ## Features
 
@@ -30,15 +30,16 @@ pip install -r requirements.txt
 python web_scraper/main.py --url "your_search_url"
 ```
 
-Replace `"your_search_url"` with the URL of the search engine page you want to scrape.
+Replace `"your_search_url"` with the URL of the search engine results page you want to scrape.
+
+The script will scrape the search results, summarize the content of each link, and generate a PDF with the summaries.
 
 ## Files
 
 - `web_scraper/main.py`: The main script that runs the web scraper.
 - `web_scraper/scraping/scrapy_spider.py`: The Scrapy spider for web scraping.
 - `web_scraper/scraping/beautifulsoup_scraper.py`: The BeautifulSoup scraper for web scraping.
-- `web_scraper/summary/openai_api.py`: The script that uses OpenAI's API to summarise the scraped data.
-- `web_scraper/pdf_generation/pdf_generator.py`: The script that generates a PDF from the summarised data.
-- `web_scraper/utils/url_input.py`: The script that prompts the user for the search URL.
-- `requirements.txt`: The file containing the required Python packages.
-- `README.md`: This file, containing the description and instructions for this project.
+- `web_scraper/summary/openai_api.py`: The script that uses OpenAI's API to summarize the scraped data.
+- `web_scraper/pdf_generation/pdf_generator.py`: The script that generates a PDF from the summarized data.
+- `web_scraper/utils/url_input.py`: The script that handles the input of the search URL.
+- `requirements.txt`: The file containing the required packages to run the scripts.

@@ -1,10 +1,9 @@
 ```python
-import sys
+import argparse
 
 def get_search_url():
-    if len(sys.argv) > 1:
-        return sys.argv[1]
-    else:
-        print("Please provide a search URL as an argument.")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description='Web Scraper')
+    parser.add_argument('url', help='Search URL to scrape')
+    args = parser.parse_args()
+    return args.url
 ```
