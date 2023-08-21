@@ -1,21 +1,33 @@
 ```python
 import scrapy
-from scrapy.http import Request
-from config import MAX_LINKS
+from scrapy.crawler import CrawlerProcess
+from scrapy.spiders import CrawlSpider, Rule
+from scrapy.linkextractors import LinkExtractor
 
-class SearchEngineSpider(scrapy.Spider):
-    name = 'search_engine_spider'
-    allowed_domains = ['searchengine.com']
-    start_urls = ['http://searchengine.com/']
+class SearchEngineSpider(CrawlSpider):
+    name = "search_engine_spider"
 
-    def parse(self, response):
-        links = response.css('a::attr(href)').getall()
-        for link in links[:MAX_LINKS]:
-            yield Request(url=link, callback=self.parse_link)
+    def __init__(self, search_url='', *args, **kwargs):
+        super(SearchEngineSpider, self).__init__(*args, **kwargs)
+        self.start_urls = [search_url]
+        self.rules = (
+            Rule(LinkExtractor(allow=(), restrict_xpaths=('//a[@class="next"]',)), callback="parse_item", follow= True),
+        )
 
-    def parse_link(self, response):
-        link = response.url
-        text_data = response.css('p::text').getall()
-        yield {'link': link, 'text_data': text_data}
+    def parse_item(self, response):
+        page_links = response.css('a::attr(href)').getall()
+        page_text = response.css('p::text').getall()
+        yield {
+            'links': page_links[:20],
+            'text': page_text
+        }
+
+def scrape_data(search_url):
+    process = CrawlerProcess(settings={
+        'FEED_FORMAT': 'json',
+        'FEED_URI': 'result.json'
+    })
+
+    process.crawl(SearchEngineSpider, search_url=search_url)
+    process.start()
 ```
-This is a basic Scrapy spider that starts at a given search engine's homepage, extracts all the links on the page, and then visits each link to extract the text data. The number of links visited is limited by the `MAX_LINKS` configuration. The extracted data is yielded as a dictionary with the link and the text data. The actual domain and start URL would need to be replaced with the actual search engine's domain and URL.

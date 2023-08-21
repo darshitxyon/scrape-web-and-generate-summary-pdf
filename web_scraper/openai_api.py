@@ -1,15 +1,17 @@
 ```python
 import openai
-from config import OPENAI_API_KEY, MAX_SUMMARY_LENGTH
+from typing import List
 
-openai.api_key = OPENAI_API_KEY
+openai.api_key = 'your-api-key'
 
-def summarize_text(text):
-    response = openai.Completion.create(
-        engine="gpt-3.5-turbo",
-        prompt=text,
-        max_tokens=MAX_SUMMARY_LENGTH,
-        temperature=0.5,
-    )
-    return response.choices[0].text.strip()
+def summarize_text(texts: List[str]) -> List[str]:
+    summaries = []
+    for text in texts:
+        response = openai.Completion.create(
+            engine="gpt-3.5-turbo",
+            prompt=text,
+            max_tokens=500
+        )
+        summaries.append(response.choices[0].text.strip())
+    return summaries
 ```
